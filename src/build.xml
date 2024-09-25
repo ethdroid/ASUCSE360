@@ -1,0 +1,22 @@
+<project name="PhaseOneProject" basedir="." default="compile">
+
+    <!-- Define the directory locations -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="bin"/>
+
+    <!-- Target to compile the Java files -->
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}"/>
+    </target>
+
+    <!-- Target to run the Java program -->
+    <target name="run" depends="compile">
+        <java classname="phaseone" fork="true">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+            </classpath>
+        </java>
+    </target>
+
+</project>
