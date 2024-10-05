@@ -38,18 +38,20 @@ public class UserLogin {
         // Create main frame
         JFrame frame = new JFrame("User Registration and Login");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(600, 500);
         frame.setLocationRelativeTo(null); // Center the frame on the screen
 
-        // Create Registration, Login, and Finish Account panels
+        // Create Registration, Login, Finish Account, and Home panels
         JPanel registrationPanel = createRegistrationPanel();
         JPanel loginPanel = createLoginPanel();
         JPanel finishAccountPanel = createFinishAccountPanel();
+        JPanel homePanel = createHomePanel();
 
         // Add panels to the main panel with identifiers
         mainPanel.add(registrationPanel, "Registration");
         mainPanel.add(loginPanel, "Login");
         mainPanel.add(finishAccountPanel, "FinishAccount");
+        mainPanel.add(homePanel, "Home");
 
         // Show Registration panel initially
         cardLayout.show(mainPanel, "Registration");
@@ -344,9 +346,16 @@ public class UserLogin {
 
                 JOptionPane.showMessageDialog(panel, "Account details updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                // Optionally, navigate to a welcome panel or reset to login
-                // For demonstration, we'll reset to Login panel
-                cardLayout.show(mainPanel, "Login");
+                // Check the role and navigate accordingly
+                String role = roles[currentUserIndex];
+                if (role.equalsIgnoreCase("admin")) {
+                    // Switch to Home panel for admin
+                    cardLayout.show(mainPanel, "Home");
+                } else {
+                    // For non-admin users, you can define other behaviors
+                    // For simplicity, we'll switch back to Login panel
+                    cardLayout.show(mainPanel, "Login");
+                }
 
                 // Clear Finish Account fields
                 emailField.setText("");
@@ -357,6 +366,34 @@ public class UserLogin {
 
                 // Reset currentUserIndex
                 currentUserIndex = -1;
+            }
+        });
+
+        return panel;
+    }
+
+    // Method to create the Home Panel for Admin
+    private static JPanel createHomePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel welcomeLabel = new JLabel("Admin Home Page", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+
+        JButton logoutButton = new JButton("Logout");
+
+        panel.add(welcomeLabel, BorderLayout.CENTER);
+        panel.add(logoutButton, BorderLayout.SOUTH);
+
+        // Logout button action
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Confirm logout
+                int response = JOptionPane.showConfirmDialog(panel, "Are you sure you want to logout?", "Confirm Logout", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    // Switch back to Login panel
+                    cardLayout.show(mainPanel, "Login");
+                }
             }
         });
 
