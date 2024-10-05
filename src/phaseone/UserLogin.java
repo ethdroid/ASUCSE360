@@ -38,7 +38,18 @@ public class UserLogin {
             public void actionPerformed(ActionEvent e) {
                 String username = userField.getText();
                 String password = new String(passField.getPassword());
-                storeUserData(username, password);
+
+                // Evaluate the password
+                String resultText = PasswordEvaluator.evaluatePassword(password);
+
+                // Check if the password is valid (no error messages returned)
+                if (!resultText.isEmpty()) {
+                    // If there's an error, show it in a dialog box
+                    JOptionPane.showMessageDialog(frame, resultText, "Password Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // If password is valid, store the username and password
+                    storeUserData(username, password);
+                }
             }
         });
         
