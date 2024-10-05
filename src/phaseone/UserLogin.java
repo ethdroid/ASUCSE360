@@ -5,20 +5,20 @@ import java.awt.event.ActionListener;
 
 class PasswordEvaluator {
     public static String evaluatePassword(String password) {
-        // Check if password is at least 6 characters
+        //check if password is at least 6 characters
         if (password.length() < 6) {
             return "Password must be at least 6 characters long.";
         }
-        // Additional password checks can be added here (e.g., special characters, numbers)
-        return ""; // Return empty string if password is valid
+        return ""; // return nothing if password is valid
     }
 }
 
 public class UserLogin {
-    // Arrays to store usernames and passwords
+    // arrays to store info
     static String[] usernames = new String[20];
     static String[] passwords = new String[20];
-    static int count = 0;  // Track the number of users stored
+    static String[] roles = new String[20];
+    static int count = 0;  //track the number of users stored
 
     // CardLayout to switch between panels
     static CardLayout cardLayout = new CardLayout();
@@ -228,6 +228,9 @@ public class UserLogin {
             }
             usernames[count] = username;
             passwords[count] = password;
+            if(count == 0) {
+                roles[0] = "admin";
+            }
             count++;
             // Uncomment the following line to display stored data in console (for testing purposes)
             // displayStoredData();
