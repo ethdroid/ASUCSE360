@@ -5,31 +5,57 @@ import java.awt.event.ActionListener;
 
 class PasswordEvaluator {
     public static String evaluatePassword(String password) {
-        //check if password is at least 6 characters
+        // Check if password is at least 6 characters
         if (password.length() < 6) {
             return "Password must be at least 6 characters long.";
         }
-        return ""; // return nothing if password is valid
+        // Additional password checks can be added here (e.g., special characters, numbers)
+        return ""; // Return empty string if password is valid
     }
 }
 
 public class UserLogin {
-    //arrays to store username/pass
+    // Arrays to store usernames and passwords
     static String[] usernames = new String[20];
     static String[] passwords = new String[20];
-    static int count = 0;  //track the number of users stored
+    static int count = 0;  // Track the number of users stored
+
+    // CardLayout to switch between panels
+    static CardLayout cardLayout = new CardLayout();
+    static JPanel mainPanel = new JPanel(cardLayout);
 
     public static void main(String[] args) {
-        //create window
-        JFrame frame = new JFrame("User Login");
+        // Create main frame
+        JFrame frame = new JFrame("User Registration and Login");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 250);
-        frame.setLocationRelativeTo(null);
+        frame.setSize(500, 300);
+        frame.setLocationRelativeTo(null); // Center the frame on the screen
 
+        // Create Registration and Login panels
+        JPanel registrationPanel = createRegistrationPanel();
+        JPanel loginPanel = createLoginPanel();
+
+        // Add panels to the main panel with identifiers
+        mainPanel.add(registrationPanel, "Registration");
+        mainPanel.add(loginPanel, "Login");
+
+        // Show Registration panel initially
+        cardLayout.show(mainPanel, "Registration");
+
+        // Add main panel to frame
+        frame.add(mainPanel);
+
+        // Display the window
+        frame.setVisible(true);
+    }
+
+    // Method to create the Registration Panel
+    private static JPanel createRegistrationPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding
 
+        // Labels and fields
         JLabel userLabel = new JLabel("Username:");
         JTextField userField = new JTextField(20);
 
@@ -39,8 +65,9 @@ public class UserLogin {
         JLabel confirmPassLabel = new JLabel("Confirm Password:");
         JPasswordField confirmPassField = new JPasswordField(20);
 
-        JButton submitButton = new JButton("Submit");
+        JButton submitButton = new JButton("Register");
 
+        // Arrange components using GridBagLayout
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -73,9 +100,7 @@ public class UserLogin {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(submitButton, gbc);
 
-        frame.add(panel);
-
-        //store username and password in arrays
+        // Register button action
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -83,58 +108,147 @@ public class UserLogin {
                 String password = new String(passField.getPassword()).trim();
                 String confirmPassword = new String(confirmPassField.getPassword()).trim();
 
-                //check if something is empty
+                // Check if any field is empty
                 if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "All fields are required.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(panel, "All fields are required.", "Input Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                //if passwords match
+                // Check if passwords match
                 if (!password.equals(confirmPassword)) {
-                    JOptionPane.showMessageDialog(frame, "Passwords do not match. Please try again.", "Password Mismatch", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(panel, "Passwords do not match. Please try again.", "Password Mismatch", JOptionPane.ERROR_MESSAGE);
                     passField.setText("");
                     confirmPassField.setText("");
                     return;
                 }
 
-                // eval password
+                // Evaluate the password
                 String resultText = PasswordEvaluator.evaluatePassword(password);
 
-                //check if the password is valid
+                // Check if the password is valid
                 if (!resultText.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, resultText, "Password Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(panel, resultText, "Password Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    //if password is good, store username and password
-                    storeUserData(username, password);
-
-                    userField.setText("");
-                    passField.setText("");
-                    confirmPassField.setText("");
+                    // If password is good, store username and password
+                    if (storeUserData(username, password)) {
+                        JOptionPane.showMessageDialog(panel, "Account created successfully! Please log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        // Switch to Login panel
+                        cardLayout.show(mainPanel, "Login");
+                        // Clear registration fields
+                        userField.setText("");
+                        passField.setText("");
+                        confirmPassField.setText("");
+                    }
                 }
             }
         });
 
-        // display the window
-        frame.setVisible(true);
+        return panel;
     }
 
-    //store user data in arrays
-    private static void storeUserData(String username, String password) {
-        //check if space to store more users
+    // Method to create the Login Panel
+    private static JPanel createLoginPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding
+
+        // Labels and fields
+        JLabel userLabel = new JLabel("Username:");
+        JTextField userField = new JTextField(20);
+
+        JLabel passLabel = new JLabel("Password:");
+        JPasswordField passField = new JPasswordField(20);
+
+        JButton loginButton = new JButton("Login");
+
+        // Arrange components using GridBagLayout
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(userLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(userField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(passLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(passField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(loginButton, gbc);
+
+        // Login button action
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String usernameInput = userField.getText().trim();
+                String passwordInput = new String(passField.getPassword()).trim();
+
+                // Check if any field is empty
+                if (usernameInput.isEmpty() || passwordInput.isEmpty()) {
+                    JOptionPane.showMessageDialog(panel, "Both fields are required.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Validate credentials
+                if (validateLogin(usernameInput, passwordInput)) {
+                    JOptionPane.showMessageDialog(panel, "Login successful! Welcome, " + usernameInput + ".", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    // Optionally, proceed to the next part of the application
+                    // For demonstration, we can clear the fields
+                    userField.setText("");
+                    passField.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                    passField.setText("");
+                }
+            }
+        });
+
+        return panel;
+    }
+
+    // Method to store user data in arrays
+    private static boolean storeUserData(String username, String password) {
+        // Check if space to store more users
         if (count < usernames.length) {
+            // Check for duplicate usernames
+            for (int i = 0; i < count; i++) {
+                if (usernames[i].equalsIgnoreCase(username)) {
+                    JOptionPane.showMessageDialog(null, "Username already exists. Please choose another.", "Duplicate Username", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
             usernames[count] = username;
             passwords[count] = password;
             count++;
-            JOptionPane.showMessageDialog(null, "Account created successfully!");
+            // Uncomment the following line to display stored data in console (for testing purposes)
+            // displayStoredData();
+            return true;
         } else {
             JOptionPane.showMessageDialog(null, "User limit reached. Cannot store more users.", "Storage Full", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
-
-        // show the contents of the arrays
-        displayStoredData();
     }
 
-    //display the stored usernames and passwords
+    // Method to validate login credentials
+    private static boolean validateLogin(String username, String password) {
+        for (int i = 0; i < count; i++) {
+            if (usernames[i].equals(username) && passwords[i].equals(password)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Optional: Method to display stored usernames and passwords (for testing purposes)
     private static void displayStoredData() {
         System.out.println("Stored Users:");
         for (int i = 0; i < count; i++) {
