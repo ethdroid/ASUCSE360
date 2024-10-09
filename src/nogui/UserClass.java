@@ -1,3 +1,4 @@
+
 package nogui;
 
 import java.util.ArrayList;
@@ -99,3 +100,4 @@ public class UserClass {
                '}';
     }
 }
+    

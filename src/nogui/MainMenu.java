@@ -1,12 +1,7 @@
 package nogui;
-
-import nogui.UserClass;
-
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.swing.JOptionPane;
 
 public class MainMenu {
     private static ArrayList<UserClass> userList = new ArrayList<>(); // Store all users
