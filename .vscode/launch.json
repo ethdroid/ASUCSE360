@@ -8,6 +8,13 @@
             "type": "java",
             "name": "UserLogin",
             "request": "launch",
+            "mainClass": "UserLogin",
+            "projectName": "ASUCSE360_9e419014"
+        },
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
             "mainClass": "phaseone.UserLogin",
             "projectName": "ASUCSE360_35255f97"
         },
