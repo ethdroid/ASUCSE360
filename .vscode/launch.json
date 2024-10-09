@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
+            "mainClass": "phaseone.UserLogin",
+            "projectName": "ASUCSE360_35255f97"
+        },
+        {
+            "type": "java",
             "name": "MainMenu",
             "request": "launch",
             "mainClass": "nogui.MainMenu",
