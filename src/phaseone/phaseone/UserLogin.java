@@ -1,9 +1,11 @@
 package phaseone;
-//final
 
-import java.util.HashMap;
-import java.util.Map;
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,7 +132,7 @@ public class UserLogin {
 
     // 2. Admin Panel for Admin Actions (Invite Users, Reset Passwords, Delete Users, List Users)
     private static JPanel createAdminPanel() {
-        JPanel panel = new JPanel(new GridLayout(10, 1));
+        JPanel panel = new JPanel(new GridLayout(6, 2));
 
         JButton inviteButton = new JButton("Invite User");
         JButton resetPasswordButton = new JButton("Reset Password");
@@ -216,14 +218,16 @@ public class UserLogin {
         // Add action listeners for article buttons
 
 // Add a map to store articles
-Map<String, String> articles = new HashMap<>();
+
+// Add a map to store articles
+Map<Long, String> articles = new HashMap<>();
 
 // Add action listeners for article buttons
 createArticle.addActionListener(e -> {
     // Code to handle creating an article
     String articleTitle = JOptionPane.showInputDialog(panel, "Enter Article Title:", "Create Article", JOptionPane.PLAIN_MESSAGE);
     if (articleTitle != null && !articleTitle.trim().isEmpty()) {
-        String articleId = "A" + (articles.size() + 1);  // Generate a simple ID for the article
+        long articleId = System.currentTimeMillis();  // Generate a unique ID for the article
         articles.put(articleId, articleTitle);
         JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
     } else {
@@ -233,8 +237,9 @@ createArticle.addActionListener(e -> {
 
 updateArticle.addActionListener(e -> {
     // Code to handle updating an article
-    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Update:", "Update Article", JOptionPane.PLAIN_MESSAGE);
-    if (articleId != null && !articleId.trim().isEmpty()) {
+    String articleIdStr = JOptionPane.showInputDialog(panel, "Enter Article ID to Update:", "Update Article", JOptionPane.PLAIN_MESSAGE);
+    try {
+        long articleId = Long.parseLong(articleIdStr);
         if (articles.containsKey(articleId)) {
             String newContent = JOptionPane.showInputDialog(panel, "Enter New Content for Article ID " + articleId + ":", "Update Article", JOptionPane.PLAIN_MESSAGE);
             if (newContent != null && !newContent.trim().isEmpty()) {
@@ -246,30 +251,32 @@ updateArticle.addActionListener(e -> {
         } else {
             JOptionPane.showMessageDialog(panel, "Article ID not found.", "Update Article", JOptionPane.ERROR_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "Update Article", JOptionPane.ERROR_MESSAGE);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(panel, "Invalid Article ID.", "Update Article", JOptionPane.ERROR_MESSAGE);
     }
 });
 
 viewArticle.addActionListener(e -> {
     // Code to handle viewing an article
-    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
-    if (articleId != null && !articleId.trim().isEmpty()) {
+    String articleIdStr = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+    try {
+        long articleId = Long.parseLong(articleIdStr);
         if (articles.containsKey(articleId)) {
             String articleContent = articles.get(articleId);
             JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articleContent, "View Article", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(panel, "Article ID not found.", "View Article", JOptionPane.ERROR_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "View Article", JOptionPane.ERROR_MESSAGE);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(panel, "Invalid Article ID.", "View Article", JOptionPane.ERROR_MESSAGE);
     }
 });
 
 deleteArticle.addActionListener(e -> {
     // Code to handle deleting an article
-    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Delete:", "Delete Article", JOptionPane.PLAIN_MESSAGE);
-    if (articleId != null && !articleId.trim().isEmpty()) {
+    String articleIdStr = JOptionPane.showInputDialog(panel, "Enter Article ID to Delete:", "Delete Article", JOptionPane.PLAIN_MESSAGE);
+    try {
+        long articleId = Long.parseLong(articleIdStr);
         if (articles.containsKey(articleId)) {
             int confirm = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete Article ID " + articleId + "?", "Delete Article", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
@@ -279,8 +286,8 @@ deleteArticle.addActionListener(e -> {
         } else {
             JOptionPane.showMessageDialog(panel, "Article ID not found.", "Delete Article", JOptionPane.ERROR_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "Delete Article", JOptionPane.ERROR_MESSAGE);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(panel, "Invalid Article ID.", "Delete Article", JOptionPane.ERROR_MESSAGE);
     }
 });
 
@@ -290,10 +297,58 @@ listArticle.addActionListener(e -> {
         JOptionPane.showMessageDialog(panel, "No articles available.", "List Articles", JOptionPane.INFORMATION_MESSAGE);
     } else {
         StringBuilder articlesList = new StringBuilder("List of Articles:\n");
-        for (Map.Entry<String, String> entry : articles.entrySet()) {
+        for (Map.Entry<Long, String> entry : articles.entrySet()) {
             articlesList.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
         }
         JOptionPane.showMessageDialog(panel, articlesList.toString(), "List Articles", JOptionPane.INFORMATION_MESSAGE);
+    }
+});
+
+// Add action listeners for backup and restore
+JButton backupButton = new JButton("Backup Articles");
+JButton restoreButton = new JButton("Restore Articles");
+panel.add(backupButton);
+panel.add(restoreButton);
+
+backupButton.addActionListener(e -> {
+    String filename = JOptionPane.showInputDialog(panel, "Enter filename to back up articles:", "Backup Articles", JOptionPane.PLAIN_MESSAGE);
+    if (filename != null && !filename.trim().isEmpty()) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(articles);
+            JOptionPane.showMessageDialog(panel, "Articles backed up successfully to " + filename, "Backup Articles", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(panel, "Failed to back up articles: " + ex.getMessage(), "Backup Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(panel, "Filename cannot be empty.", "Backup Error", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+restoreButton.addActionListener(e -> {
+    String filename = JOptionPane.showInputDialog(panel, "Enter filename to restore articles:", "Restore Articles", JOptionPane.PLAIN_MESSAGE);
+    if (filename != null && !filename.trim().isEmpty()) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            Map<Long, String> restoredArticles = (Map<Long, String>) ois.readObject();
+            String[] options = {"Replace Existing Articles", "Merge with Existing Articles"};
+            int choice = JOptionPane.showOptionDialog(panel, "Choose restore option:", "Restore Articles", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            
+            if (choice == 0) {
+                articles.clear();
+                articles.putAll(restoredArticles);
+                JOptionPane.showMessageDialog(panel, "Articles replaced successfully from " + filename, "Restore Articles", JOptionPane.INFORMATION_MESSAGE);
+            } else if (choice == 1) {
+                for (Map.Entry<Long, String> entry : restoredArticles.entrySet()) {
+                    if (!articles.containsKey(entry.getKey())) {
+                        articles.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                JOptionPane.showMessageDialog(panel, "Articles merged successfully from " + filename, "Restore Articles", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(panel, "Failed to restore articles: " + ex.getMessage(), "Restore Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(panel, "Filename cannot be empty.", "Restore Error", JOptionPane.ERROR_MESSAGE);
     }
 });
 
