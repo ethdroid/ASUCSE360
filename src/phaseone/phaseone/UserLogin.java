@@ -306,7 +306,7 @@ listArticle.addActionListener(e -> {
         return Integer.toHexString(new Random().nextInt(0xFFFFFF)).toUpperCase();
     }
 
-    private static String generateOneTimePassword() {
+    static String generateOneTimePassword() {
         return Integer.toHexString(new Random().nextInt(0xFFFFFF)).toUpperCase();
     }
 
