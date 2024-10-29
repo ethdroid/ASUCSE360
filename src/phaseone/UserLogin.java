@@ -1,9 +1,11 @@
-package phaseone;
+
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
+import phaseone.Invitation;
+import phaseone.User;
 
 public class UserLogin {
     static ArrayList<User> users = new ArrayList<>();
@@ -125,18 +127,28 @@ public class UserLogin {
 
     // 2. Admin Panel for Admin Actions (Invite Users, Reset Passwords, Delete Users, List Users)
     private static JPanel createAdminPanel() {
-        JPanel panel = new JPanel(new GridLayout(5, 1));
+        JPanel panel = new JPanel(new GridLayout(10, 1));
 
         JButton inviteButton = new JButton("Invite User");
         JButton resetPasswordButton = new JButton("Reset Password");
         JButton deleteUserButton = new JButton("Delete User");
         JButton listUsersButton = new JButton("List Users");
+        JButton createArticle = new JButton("Create Articles");
+        JButton updateArticle = new JButton("Update Articles");
+        JButton viewArticle = new JButton("View Articles");
+        JButton deleteArticle = new JButton("Delete Articles");
+        JButton listArticle = new JButton("List Articles");
         JButton logoutButton = new JButton("Logout");
 
         panel.add(inviteButton);
         panel.add(resetPasswordButton);
         panel.add(deleteUserButton);
         panel.add(listUsersButton);
+        panel.add(createArticle);
+        panel.add(updateArticle);
+        panel.add(viewArticle);
+        panel.add(deleteArticle);
+        panel.add(listArticle);
         panel.add(logoutButton);
 
         // Invite a user

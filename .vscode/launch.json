@@ -9,6 +9,13 @@
             "name": "UserLogin",
             "request": "launch",
             "mainClass": "UserLogin",
+            "projectName": "ASUCSE360_6321bae8"
+        },
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
+            "mainClass": "UserLogin",
             "projectName": "ASUCSE360_9e419014"
         },
         {
