@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
+            "mainClass": "UserLogin",
+            "projectName": "ASUCSE360_6321bae8"
+        },
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
+            "mainClass": "UserLogin",
+            "projectName": "ASUCSE360_9e419014"
+        },
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
+            "mainClass": "phaseone.UserLogin",
+            "projectName": "ASUCSE360_35255f97"
+        },
+        {
+            "type": "java",
+            "name": "MainMenu",
+            "request": "launch",
+            "mainClass": "nogui.MainMenu",
+            "projectName": "ASUCSE360_9e419014"
+        }
+    ]
+}
