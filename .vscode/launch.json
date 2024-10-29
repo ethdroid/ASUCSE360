@@ -8,6 +8,27 @@
             "type": "java",
             "name": "UserLogin",
             "request": "launch",
+            "mainClass": "phaseone.UserLogin",
+            "projectName": "ASUCSE360_75a4f175"
+        },
+        {
+            "type": "java",
+            "name": "HelpArticleManager",
+            "request": "launch",
+            "mainClass": "HelpArticleManager",
+            "projectName": "ASUCSE360_75a4f175"
+        },
+        {
+            "type": "java",
+            "name": "HelpArticleApp",
+            "request": "launch",
+            "mainClass": "HelpArticleApp",
+            "projectName": "ASUCSE360_75a4f175"
+        },
+        {
+            "type": "java",
+            "name": "UserLogin",
+            "request": "launch",
             "mainClass": "UserLogin",
             "projectName": "ASUCSE360_75a4f175"
         },

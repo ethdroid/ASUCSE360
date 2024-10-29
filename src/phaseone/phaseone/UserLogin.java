@@ -1,11 +1,13 @@
+package phaseone;
 
-
+import java.util.HashMap;
+import java.util.Map;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import javax.swing.*;
-import phaseone.Invitation;
-import phaseone.User;
 
 public class UserLogin {
     static ArrayList<User> users = new ArrayList<>();
@@ -210,6 +212,90 @@ public class UserLogin {
             }
             JOptionPane.showMessageDialog(panel, userList.toString(), "User List", JOptionPane.INFORMATION_MESSAGE);
         });
+        // Add action listeners for article buttons
+
+// Add a map to store articles
+Map<String, String> articles = new HashMap<>();
+
+// Add action listeners for article buttons
+createArticle.addActionListener(e -> {
+    // Code to handle creating an article
+    String articleTitle = JOptionPane.showInputDialog(panel, "Enter Article Title:", "Create Article", JOptionPane.PLAIN_MESSAGE);
+    if (articleTitle != null && !articleTitle.trim().isEmpty()) {
+        String articleId = "A" + (articles.size() + 1);  // Generate a simple ID for the article
+        articles.put(articleId, articleTitle);
+        JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(panel, "Article title cannot be empty.", "Create Article", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+updateArticle.addActionListener(e -> {
+    // Code to handle updating an article
+    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Update:", "Update Article", JOptionPane.PLAIN_MESSAGE);
+    if (articleId != null && !articleId.trim().isEmpty()) {
+        if (articles.containsKey(articleId)) {
+            String newContent = JOptionPane.showInputDialog(panel, "Enter New Content for Article ID " + articleId + ":", "Update Article", JOptionPane.PLAIN_MESSAGE);
+            if (newContent != null && !newContent.trim().isEmpty()) {
+                articles.put(articleId, newContent);
+                JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' updated successfully!", "Update Article", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(panel, "New content cannot be empty.", "Update Article", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(panel, "Article ID not found.", "Update Article", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "Update Article", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+viewArticle.addActionListener(e -> {
+    // Code to handle viewing an article
+    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+    if (articleId != null && !articleId.trim().isEmpty()) {
+        if (articles.containsKey(articleId)) {
+            String articleContent = articles.get(articleId);
+            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articleContent, "View Article", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Article ID not found.", "View Article", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "View Article", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+deleteArticle.addActionListener(e -> {
+    // Code to handle deleting an article
+    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Delete:", "Delete Article", JOptionPane.PLAIN_MESSAGE);
+    if (articleId != null && !articleId.trim().isEmpty()) {
+        if (articles.containsKey(articleId)) {
+            int confirm = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete Article ID " + articleId + "?", "Delete Article", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                articles.remove(articleId);
+                JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' deleted successfully!", "Delete Article", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(panel, "Article ID not found.", "Delete Article", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "Delete Article", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+listArticle.addActionListener(e -> {
+    // Code to handle listing all articles
+    if (articles.isEmpty()) {
+        JOptionPane.showMessageDialog(panel, "No articles available.", "List Articles", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        StringBuilder articlesList = new StringBuilder("List of Articles:\n");
+        for (Map.Entry<String, String> entry : articles.entrySet()) {
+            articlesList.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+        }
+        JOptionPane.showMessageDialog(panel, articlesList.toString(), "List Articles", JOptionPane.INFORMATION_MESSAGE);
+    }
+});
+
 
         // Logout
         logoutButton.addActionListener(e -> cardLayout.show(mainPanel, "Login"));
