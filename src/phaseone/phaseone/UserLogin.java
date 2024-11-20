@@ -546,22 +546,118 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
 
             // Action listeners for Instructor functionalities
             searchArticlesButton.addActionListener(e -> {
-                String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
-                if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                    StringBuilder results = new StringBuilder("Search Results:\n");
-                    for (Map.Entry<String, Article> entry : articles.entrySet()) {
-                        Article article = entry.getValue(); // Get the Article object
-                        if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
-                            results.append(entry.getKey()) // Article ID
-                                .append(" - ")
-                                .append(article.getTitle()) // Article Title
-                                .append("\n");
-                        }
+                // Prompt the user to select a search type
+                String[] searchOptions = {"Search by Article ID", "Search by Keyword in Title", "Search by Author", "Search by Content Level"};
+                String searchType = (String) JOptionPane.showInputDialog(
+                        panel,
+                        "Select search type:",
+                        "Search Articles",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        searchOptions,
+                        searchOptions[0]);
+            
+                if (searchType != null) {
+                    String searchKeyword = null;
+            
+                    switch (searchType) {
+                        case "Search by Article ID":
+                        case "Search by Keyword in Title":
+                            // Prompt user to input search keyword
+                            searchKeyword = JOptionPane.showInputDialog(panel, "Enter search keyword:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
+                            break;
+            
+                        case "Search by Author":
+                            // Dropdown menu for author
+                            String[] authors = {"Instructor", "Admin"};
+                            searchKeyword = (String) JOptionPane.showInputDialog(
+                                    panel,
+                                    "Select author:",
+                                    "Search by Author",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    authors,
+                                    authors[0]);
+                            break;
+            
+                        case "Search by Content Level":
+                            // Dropdown menu for content level
+                            String[] levels = {"All", "Beginner", "Intermediate", "Advanced", "Expert"};
+                            searchKeyword = (String) JOptionPane.showInputDialog(
+                                    panel,
+                                    "Select content level:",
+                                    "Search by Content Level",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    levels,
+                                    levels[0]);
+                            break;
                     }
-                    
-                    JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            
+                    if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                        StringBuilder results = new StringBuilder("Search Results:\n");
+            
+                        switch (searchType) {
+                            case "Search by Article ID":
+                                if (articles.containsKey(searchKeyword)) {
+                                    Article article = articles.get(searchKeyword);
+                                    results.append("ID: ").append(article.getId())
+                                            .append("\nTitle: ").append(article.getTitle())
+                                            .append("\nAuthor: ").append(article.getCreatedBy())
+                                            .append("\nContent Level: ").append(article.getLevel())
+                                            .append("\n\n");
+                                } else {
+                                    JOptionPane.showMessageDialog(panel, "No article found with the specified ID.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                                    return;
+                                }
+                                break;
+            
+                            case "Search by Keyword in Title":
+                                for (Article article : articles.values()) {
+                                    if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            case "Search by Author":
+                                for (Article article : articles.values()) {
+                                    if (article.getCreatedBy().equalsIgnoreCase(searchKeyword)) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            case "Search by Content Level":
+                                for (Article article : articles.values()) {
+                                    if (searchKeyword.equals("All") || article.getLevel().equalsIgnoreCase(searchKeyword)) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            default:
+                                JOptionPane.showMessageDialog(panel, "Invalid search type selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                        }
+            
+                        // Display results
+                        JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             });
 
