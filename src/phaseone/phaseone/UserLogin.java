@@ -1,6 +1,7 @@
 package phaseone;
 
 
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class UserLogin {
     static int currentUserIndex = -1;
     static CardLayout cardLayout = new CardLayout();
     static JPanel mainPanel = new JPanel(cardLayout);
-    static Map<String, String> articles = new HashMap<>(); // This map stores article IDs and titles
+    static Map<String, Article> articles = new HashMap<>();
 
     public static void main(String[] args) {
         // Main Frame setup
@@ -50,6 +51,48 @@ mainPanel.add(createStudentPanel(), "Student");
         frame.setVisible(true);
     }
 
+    static class Article {
+        private String id;
+        private String title;
+        private String content;
+        private String createdBy;
+        private boolean isPublic;
+    
+        public Article(String id, String title, String content, String createdBy, boolean isPublic) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.createdBy = createdBy;
+            this.isPublic = isPublic;
+        }
+    
+        public String getId() {
+            return id;
+        }
+    
+        public String getTitle() {
+            return title;
+        }
+    
+        public String getContent() {
+            return content;
+        }
+    
+        public String getCreatedBy() {
+            return createdBy;
+        }
+    
+        public boolean isPublic() {
+            return isPublic;
+        }
+    
+        @Override
+        public String toString() {
+            return id + " - " + title + " (Created by: " + createdBy + ")";
+        }
+    }
+    
+    
     private static void resetFinishAccountFields(JTextField... fields) {
         for (JTextField field : fields) {
             field.setText(""); // Clear the text in each field
@@ -156,11 +199,16 @@ private static JPanel createStudentPanel() {
         String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
             StringBuilder results = new StringBuilder("Search Results:\n");
-            for (Map.Entry<String, String> entry : articles.entrySet()) {
-                if (entry.getValue().toLowerCase().contains(searchKeyword.toLowerCase())) {
-                    results.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+            for (Map.Entry<String, Article> entry : articles.entrySet()) {
+                Article article = entry.getValue(); // Get the Article object
+                if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                    results.append(entry.getKey()) // Article ID
+                          .append(" - ")
+                          .append(article.getTitle()) // Article Title
+                          .append("\n");
                 }
             }
+            
             JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -168,14 +216,27 @@ private static JPanel createStudentPanel() {
     });
 
     viewArticleButton.addActionListener(e -> {
-        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+        StringBuilder articleList = new StringBuilder("Public Articles:\n");
+        for (Article article : articles.values()) {
+            if (article.isPublic()) {
+                articleList.append(article.toString()).append("\n");
+            }
+        }
+        String articleId = JOptionPane.showInputDialog(panel, articleList + "\nEnter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
         if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
-            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articles.get(articleId), "View Article", JOptionPane.INFORMATION_MESSAGE);
+            Article article = articles.get(articleId);
+            if (article.isPublic()) {
+                JOptionPane.showMessageDialog(panel, "ID: " + article.getId() +
+                        "\nTitle: " + article.getTitle() +
+                        "\nContent: " + article.getContent(), "Article Details", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(panel, "You do not have permission to view this article.", "Access Denied", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     });
-
+    
     sendFeedbackButton.addActionListener(e -> {
         String feedback = JOptionPane.showInputDialog(panel, "Enter your feedback or issue:", "Send Feedback", JOptionPane.PLAIN_MESSAGE);
         if (feedback != null && !feedback.trim().isEmpty()) {
@@ -214,21 +275,35 @@ private static JPanel createInstructorPanel() {
         String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
             StringBuilder results = new StringBuilder("Search Results:\n");
-            for (Map.Entry<String, String> entry : articles.entrySet()) {
-                if (entry.getValue().toLowerCase().contains(searchKeyword.toLowerCase())) {
-                    results.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+            for (Map.Entry<String, Article> entry : articles.entrySet()) {
+                Article article = entry.getValue(); // Get the Article object
+                if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                    results.append(entry.getKey()) // Article ID
+                          .append(" - ")
+                          .append(article.getTitle()) // Article Title
+                          .append("\n");
                 }
             }
+            
             JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     });
 
+    
     viewArticleButton.addActionListener(e -> {
-        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+        StringBuilder articleList = new StringBuilder("Available Articles:\n");
+        for (Article article : articles.values()) {
+            articleList.append(article.toString()).append("\n");
+        }
+        String articleId = JOptionPane.showInputDialog(panel, articleList + "\nEnter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
         if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
-            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articles.get(articleId), "View Article", JOptionPane.INFORMATION_MESSAGE);
+            Article article = articles.get(articleId);
+            JOptionPane.showMessageDialog(panel, "ID: " + article.getId() +
+                    "\nTitle: " + article.getTitle() +
+                    "\nContent: " + article.getContent() +
+                    "\nCreated By: " + article.getCreatedBy(), "Article Details", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -237,26 +312,42 @@ private static JPanel createInstructorPanel() {
     createArticleButton.addActionListener(e -> {
         String articleTitle = JOptionPane.showInputDialog(panel, "Enter Article Title:", "Create Article", JOptionPane.PLAIN_MESSAGE);
         if (articleTitle != null && !articleTitle.trim().isEmpty()) {
-            String articleId = "A" + (articles.size() + 1);  // Generate simple article ID
-            articles.put(articleId, articleTitle);
-            JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+            String articleContent = JOptionPane.showInputDialog(panel, "Enter Article Content:", "Create Article", JOptionPane.PLAIN_MESSAGE);
+            if (articleContent != null && !articleContent.trim().isEmpty()) {
+                boolean isPublic = JOptionPane.showConfirmDialog(panel, "Make this article public for students?", "Public Article", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+                
+                // Instructor creating the article
+                String createdBy = users.get(currentUserIndex).getRoles().get(0);
+    
+                String articleId = "A" + (articles.size() + 1); // Generate unique ID
+                articles.put(articleId, new Article(articleId, articleTitle, articleContent, createdBy, isPublic));
+    
+                JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(panel, "Article content cannot be empty.", "Create Article", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            JOptionPane.showMessageDialog(panel, "Article title cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(panel, "Article title cannot be empty.", "Create Article", JOptionPane.ERROR_MESSAGE);
         }
     });
+    
 
     editArticleButton.addActionListener(e -> {
         String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Edit:", "Edit Article", JOptionPane.PLAIN_MESSAGE);
-        if (articleId != null && articles.containsKey(articleId)) {
+        if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
+            Article article = articles.get(articleId);
             String newContent = JOptionPane.showInputDialog(panel, "Enter New Content for Article ID " + articleId + ":", "Edit Article", JOptionPane.PLAIN_MESSAGE);
             if (newContent != null && !newContent.trim().isEmpty()) {
-                articles.put(articleId, newContent);
+                article.content = newContent; // Update content field
                 JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' updated successfully!", "Edit Article", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(panel, "New content cannot be empty.", "Edit Article", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     });
+    
 
     deleteArticleButton.addActionListener(e -> {
         String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Delete:", "Delete Article", JOptionPane.PLAIN_MESSAGE);
@@ -364,29 +455,47 @@ private static JPanel createInstructorPanel() {
         // Add action listeners for article buttons
 
 // Add a map to store articles
-Map<String, String> articles = new HashMap<>();
+//Map<String, String> articles = new HashMap<>();
 
 // Add action listeners for article buttons
 createArticle.addActionListener(e -> {
     // Code to handle creating an article
     String articleTitle = JOptionPane.showInputDialog(panel, "Enter Article Title:", "Create Article", JOptionPane.PLAIN_MESSAGE);
     if (articleTitle != null && !articleTitle.trim().isEmpty()) {
-        String articleId = "A" + (articles.size() + 1);  // Generate a simple ID for the article
-        articles.put(articleId, articleTitle);
-        JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+        String articleContent = JOptionPane.showInputDialog(panel, "Enter Article Content:", "Create Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleContent != null && !articleContent.trim().isEmpty()) {
+            boolean isPublic = JOptionPane.showConfirmDialog(panel, "Make this article public for students?", "Public Article", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+            
+            // Get the role of the currently logged-in user
+            String createdBy = users.get(currentUserIndex).getRoles().get(0); // Assuming the role is stored as the first role
+
+            // Generate a unique article ID
+            String articleId = "A" + (articles.size() + 1);
+
+            // Create and store the article
+            Article newArticle = new Article(articleId, articleTitle, articleContent, createdBy, isPublic);
+            articles.put(articleId, newArticle);
+
+            JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Article content cannot be empty.", "Create Article", JOptionPane.ERROR_MESSAGE);
+        }
     } else {
         JOptionPane.showMessageDialog(panel, "Article title cannot be empty.", "Create Article", JOptionPane.ERROR_MESSAGE);
     }
 });
+
+
 
 updateArticle.addActionListener(e -> {
     // Code to handle updating an article
     String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Update:", "Update Article", JOptionPane.PLAIN_MESSAGE);
     if (articleId != null && !articleId.trim().isEmpty()) {
         if (articles.containsKey(articleId)) {
+            Article article = articles.get(articleId); // Retrieve the existing Article
             String newContent = JOptionPane.showInputDialog(panel, "Enter New Content for Article ID " + articleId + ":", "Update Article", JOptionPane.PLAIN_MESSAGE);
             if (newContent != null && !newContent.trim().isEmpty()) {
-                articles.put(articleId, newContent);
+                article.content = newContent; // Update the content of the existing Article
                 JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' updated successfully!", "Update Article", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(panel, "New content cannot be empty.", "Update Article", JOptionPane.ERROR_MESSAGE);
@@ -399,20 +508,24 @@ updateArticle.addActionListener(e -> {
     }
 });
 
+
 viewArticle.addActionListener(e -> {
-    // Code to handle viewing an article
-    String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
-    if (articleId != null && !articleId.trim().isEmpty()) {
-        if (articles.containsKey(articleId)) {
-            String articleContent = articles.get(articleId);
-            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articleContent, "View Article", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(panel, "Article ID not found.", "View Article", JOptionPane.ERROR_MESSAGE);
-        }
+    StringBuilder articleList = new StringBuilder("Available Articles:\n");
+    for (Article article : articles.values()) {
+        articleList.append(article.toString()).append("\n");
+    }
+    String articleId = JOptionPane.showInputDialog(panel, articleList + "\nEnter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+    if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
+        Article article = articles.get(articleId);
+        JOptionPane.showMessageDialog(panel, "ID: " + article.getId() +
+                "\nTitle: " + article.getTitle() +
+                "\nContent: " + article.getContent() +
+                "\nCreated By: " + article.getCreatedBy(), "Article Details", JOptionPane.INFORMATION_MESSAGE);
     } else {
-        JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "View Article", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 });
+
 
 deleteArticle.addActionListener(e -> {
     // Code to handle deleting an article
@@ -431,17 +544,16 @@ deleteArticle.addActionListener(e -> {
         JOptionPane.showMessageDialog(panel, "Article ID cannot be empty.", "Delete Article", JOptionPane.ERROR_MESSAGE);
     }
 });
-
 listArticle.addActionListener(e -> {
     // Code to handle listing all articles
     if (articles.isEmpty()) {
         JOptionPane.showMessageDialog(panel, "No articles available.", "List Articles", JOptionPane.INFORMATION_MESSAGE);
     } else {
-        StringBuilder articlesList = new StringBuilder("List of Articles:\n");
-        for (Map.Entry<String, String> entry : articles.entrySet()) {
-            articlesList.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+        StringBuilder articleList = new StringBuilder("Available Articles:\n");
+        for (Article article : articles.values()) {
+            articleList.append(article.toString()).append("\n");
         }
-        JOptionPane.showMessageDialog(panel, articlesList.toString(), "List Articles", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(panel, articleList.toString(), "List Articles", JOptionPane.INFORMATION_MESSAGE);
     }
 });
 
