@@ -256,7 +256,7 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
             panel.add(groupByLevelButton); // Add new button
 
 
-            panel.add(searchArticlesButton);
+            panel.add(searchArticlesButton); //rth
             panel.add(viewArticleButton);
             panel.add(sendFeedbackButton);
             panel.add(logoutButton);
