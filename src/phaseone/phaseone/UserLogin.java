@@ -3,16 +3,16 @@
 
 
         import java.awt.*;
+        import java.io.FileInputStream;
+        import java.io.FileOutputStream;
+        import java.io.ObjectInputStream;
+        import java.io.ObjectOutputStream;
         import java.util.ArrayList;
         import java.util.HashMap;
+        import java.util.List;
         import java.util.Map;
         import java.util.Random;
-        import javax.swing.*;
-        import java.util.List;
-        import java.io.ObjectInputStream;
-        import java.io.FileInputStream;
-        import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
+import javax.swing.*;
 
 
 
@@ -252,89 +252,128 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
             JButton viewArticleButton = new JButton("View Article");
             JButton sendFeedbackButton = new JButton("Send Feedback");
             JButton logoutButton = new JButton("Logout");
-            JButton groupByLevelButton = new JButton("View Articles by Level"); // New button
-            panel.add(groupByLevelButton); // Add new button
 
 
             panel.add(searchArticlesButton); //rth
             panel.add(viewArticleButton);
             panel.add(sendFeedbackButton);
             panel.add(logoutButton);
-            JButton viewGroupedArticlesButton = new JButton("View Articles by Level");
-            panel.add(viewGroupedArticlesButton);
             
-            viewGroupedArticlesButton.addActionListener(e -> {
-                String[] levels = {"All", "Beginner", "Intermediate", "Advanced", "Expert"};
-                String selectedLevel = (String) JOptionPane.showInputDialog(
-                        panel,
-                        "Select a level to view articles:",
-                        "View Articles by Level",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        levels,
-                        "All" // Default selection
-                );
-            
-                if (selectedLevel != null) {
-                    Map<String, Article> filteredArticles = filterArticlesByLevel(selectedLevel);
-            
-                    if (filteredArticles.isEmpty()) {
-                        JOptionPane.showMessageDialog(panel, "No articles found for the selected level.", "No Articles", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        StringBuilder articleList = new StringBuilder("Articles (" + selectedLevel + "):\n");
-                        for (Article article : filteredArticles.values()) {
-                            articleList.append(article.toString()).append("\n");
-                        }
-                        JOptionPane.showMessageDialog(panel, articleList.toString(), "Articles by Level", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            });
-
-            groupByLevelButton.addActionListener(e -> {
-                String[] levels = {"All", "Beginner", "Intermediate", "Advanced", "Expert"};
-                String selectedLevel = (String) JOptionPane.showInputDialog(panel,
-                        "Select the content level to view articles:",
-                        "Group Articles by Level",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        levels,
-                        "All"); // Default is "All"
-        
-                if (selectedLevel != null) {
-                    Map<String, Article> filteredArticles = filterArticlesByLevel(selectedLevel);
-                    if (filteredArticles.isEmpty()) {
-                        JOptionPane.showMessageDialog(panel, "No articles found for the selected level.", "Group Articles", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        StringBuilder groupedResults = new StringBuilder("Articles for Level: " + selectedLevel + "\n");
-                        for (Map.Entry<String, Article> entry : filteredArticles.entrySet()) {
-                            groupedResults.append(entry.getKey()).append(" - ").append(entry.getValue().getTitle()).append("\n");
-                        }
-                        JOptionPane.showMessageDialog(panel, groupedResults.toString(), "Grouped Articles", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(panel, "No level selected.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        
             
             // Action listeners for Student functionalities
             searchArticlesButton.addActionListener(e -> {
-                String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
-                if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                    StringBuilder results = new StringBuilder("Search Results:\n");
-                    for (Map.Entry<String, Article> entry : articles.entrySet()) {
-                        Article article = entry.getValue(); // Get the Article object
-                        if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
-                            results.append(entry.getKey()) // Article ID
-                                .append(" - ")
-                                .append(article.getTitle()) // Article Title
-                                .append("\n");
-                        }
+                // Prompt the user to select a search type
+                String[] searchOptions = {"Search by Article ID", "Search by Keyword in Title", "Search by Author", "Search by Content Level"};
+                String searchType = (String) JOptionPane.showInputDialog(
+                        panel,
+                        "Select search type:",
+                        "Search Articles",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        searchOptions,
+                        searchOptions[0]);
+            
+                if (searchType != null) {
+                    String searchKeyword = null;
+            
+                    switch (searchType) {
+                        case "Search by Article ID":
+                        case "Search by Keyword in Title":
+                            // Prompt user to input search keyword
+                            searchKeyword = JOptionPane.showInputDialog(panel, "Enter search keyword:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
+                            break;
+            
+                        case "Search by Author":
+                            // Dropdown menu for author
+                            String[] authors = {"Instructor", "Admin"};
+                            searchKeyword = (String) JOptionPane.showInputDialog(
+                                    panel,
+                                    "Select author:",
+                                    "Search by Author",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    authors,
+                                    authors[0]);
+                            break;
+            
+                        case "Search by Content Level":
+                            // Dropdown menu for content level
+                            String[] levels = {"All", "Beginner", "Intermediate", "Advanced", "Expert"};
+                            searchKeyword = (String) JOptionPane.showInputDialog(
+                                    panel,
+                                    "Select content level:",
+                                    "Search by Content Level",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    levels,
+                                    levels[0]);
+                            break;
                     }
-                    
-                    JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            
+                    if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                        StringBuilder results = new StringBuilder("Search Results:\n");
+            
+                        switch (searchType) {
+                            case "Search by Article ID":
+                                if (articles.containsKey(searchKeyword)) {
+                                    Article article = articles.get(searchKeyword);
+                                    results.append("ID: ").append(article.getId())
+                                            .append("\nTitle: ").append(article.getTitle())
+                                            .append("\nAuthor: ").append(article.getCreatedBy())
+                                            .append("\nContent Level: ").append(article.getLevel())
+                                            .append("\n\n");
+                                } else {
+                                    JOptionPane.showMessageDialog(panel, "No article found with the specified ID.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                                    return;
+                                }
+                                break;
+            
+                            case "Search by Keyword in Title":
+                                for (Article article : articles.values()) {
+                                    if (article.getTitle().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            case "Search by Author":
+                                for (Article article : articles.values()) {
+                                    if (article.getCreatedBy().equalsIgnoreCase(searchKeyword)) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            case "Search by Content Level":
+                                for (Article article : articles.values()) {
+                                    if (searchKeyword.equals("All") || article.getLevel().equalsIgnoreCase(searchKeyword)) {
+                                        results.append("ID: ").append(article.getId())
+                                                .append("\nTitle: ").append(article.getTitle())
+                                                .append("\nAuthor: ").append(article.getCreatedBy())
+                                                .append("\nContent Level: ").append(article.getLevel())
+                                                .append("\n\n");
+                                    }
+                                }
+                                break;
+            
+                            default:
+                                JOptionPane.showMessageDialog(panel, "Invalid search type selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                                return;
+                        }
+            
+                        // Display results
+                        JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             });
 
@@ -764,7 +803,7 @@ panel.add(restoreArticlesButton);
                     String articleId = "A" + (articles.size() + 1);
 
                     // Create and store the article
-                    String defaultLevel = "Beginner"; // Set a default content level
+                    String defaultLevel = "All"; // Set a default content level
                     Article newArticle = new Article(articleId, articleTitle, articleContent, createdBy, isPublic, defaultLevel);
                     articles.put(articleId, newArticle);
                                     articles.put(articleId, newArticle);
