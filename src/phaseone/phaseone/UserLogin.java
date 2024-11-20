@@ -1,5 +1,5 @@
 package phaseone;
-//hope
+
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,6 +14,7 @@ public class UserLogin {
     static int currentUserIndex = -1;
     static CardLayout cardLayout = new CardLayout();
     static JPanel mainPanel = new JPanel(cardLayout);
+    static Map<String, String> articles = new HashMap<>(); // This map stores article IDs and titles
 
     public static void main(String[] args) {
         // Main Frame setup
@@ -35,6 +36,9 @@ public class UserLogin {
         mainPanel.add(adminPanel, "Admin");
         mainPanel.add(createFinishAccountPanel(), "FinishAccount");
         mainPanel.add(createAdminPanel(), "Admin");
+        mainPanel.add(createInstructorPanel(), "Instructor");
+mainPanel.add(createStudentPanel(), "Student");
+
 
 
 
@@ -45,6 +49,13 @@ public class UserLogin {
         frame.add(mainPanel);
         frame.setVisible(true);
     }
+
+    private static void resetFinishAccountFields(JTextField... fields) {
+        for (JTextField field : fields) {
+            field.setText(""); // Clear the text in each field
+        }
+    }
+    
 
     // 1. Create Registration Panel for Admin
     private static JPanel createRegistrationPanel() {
@@ -125,6 +136,145 @@ public class UserLogin {
         return panel;
     }
 
+
+    // 6. Student Panel for Student Actions
+private static JPanel createStudentPanel() {
+    JPanel panel = new JPanel(new GridLayout(4, 1));
+
+    JButton searchArticlesButton = new JButton("Search Articles");
+    JButton viewArticleButton = new JButton("View Article");
+    JButton sendFeedbackButton = new JButton("Send Feedback");
+    JButton logoutButton = new JButton("Logout");
+
+    panel.add(searchArticlesButton);
+    panel.add(viewArticleButton);
+    panel.add(sendFeedbackButton);
+    panel.add(logoutButton);
+
+    // Action listeners for Student functionalities
+    searchArticlesButton.addActionListener(e -> {
+        String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            StringBuilder results = new StringBuilder("Search Results:\n");
+            for (Map.Entry<String, String> entry : articles.entrySet()) {
+                if (entry.getValue().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                    results.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+                }
+            }
+            JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    viewArticleButton.addActionListener(e -> {
+        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
+            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articles.get(articleId), "View Article", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    sendFeedbackButton.addActionListener(e -> {
+        String feedback = JOptionPane.showInputDialog(panel, "Enter your feedback or issue:", "Send Feedback", JOptionPane.PLAIN_MESSAGE);
+        if (feedback != null && !feedback.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(panel, "Thank you for your feedback!", "Feedback Sent", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Feedback cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    logoutButton.addActionListener(e -> cardLayout.show(mainPanel, "Login"));
+
+    return panel;
+}
+
+// 5. Instructor Panel for Instructor Actions
+private static JPanel createInstructorPanel() {
+    JPanel panel = new JPanel(new GridLayout(6, 1));
+
+    JButton searchArticlesButton = new JButton("Search Articles");
+    JButton viewArticleButton = new JButton("View Article");
+    JButton createArticleButton = new JButton("Create Article");
+    JButton editArticleButton = new JButton("Edit Article");
+    JButton deleteArticleButton = new JButton("Delete Article");
+    JButton logoutButton = new JButton("Logout");
+    
+
+    panel.add(searchArticlesButton);
+    panel.add(viewArticleButton);
+    panel.add(createArticleButton);
+    panel.add(editArticleButton);
+    panel.add(deleteArticleButton);
+    panel.add(logoutButton);
+
+    // Action listeners for Instructor functionalities
+    searchArticlesButton.addActionListener(e -> {
+        String searchKeyword = JOptionPane.showInputDialog(panel, "Enter keyword to search articles:", "Search Articles", JOptionPane.PLAIN_MESSAGE);
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            StringBuilder results = new StringBuilder("Search Results:\n");
+            for (Map.Entry<String, String> entry : articles.entrySet()) {
+                if (entry.getValue().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                    results.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
+                }
+            }
+            JOptionPane.showMessageDialog(panel, results.length() > 0 ? results.toString() : "No articles found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Search keyword cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    viewArticleButton.addActionListener(e -> {
+        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to View:", "View Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleId != null && !articleId.trim().isEmpty() && articles.containsKey(articleId)) {
+            JOptionPane.showMessageDialog(panel, "Article ID: " + articleId + "\nContent: " + articles.get(articleId), "View Article", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    createArticleButton.addActionListener(e -> {
+        String articleTitle = JOptionPane.showInputDialog(panel, "Enter Article Title:", "Create Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleTitle != null && !articleTitle.trim().isEmpty()) {
+            String articleId = "A" + (articles.size() + 1);  // Generate simple article ID
+            articles.put(articleId, articleTitle);
+            JOptionPane.showMessageDialog(panel, "Article '" + articleTitle + "' created successfully with ID: " + articleId, "Create Article", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(panel, "Article title cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    editArticleButton.addActionListener(e -> {
+        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Edit:", "Edit Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleId != null && articles.containsKey(articleId)) {
+            String newContent = JOptionPane.showInputDialog(panel, "Enter New Content for Article ID " + articleId + ":", "Edit Article", JOptionPane.PLAIN_MESSAGE);
+            if (newContent != null && !newContent.trim().isEmpty()) {
+                articles.put(articleId, newContent);
+                JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' updated successfully!", "Edit Article", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    deleteArticleButton.addActionListener(e -> {
+        String articleId = JOptionPane.showInputDialog(panel, "Enter Article ID to Delete:", "Delete Article", JOptionPane.PLAIN_MESSAGE);
+        if (articleId != null && articles.containsKey(articleId)) {
+            int confirm = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete Article ID " + articleId + "?", "Delete Article", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                articles.remove(articleId);
+                JOptionPane.showMessageDialog(panel, "Article ID '" + articleId + "' deleted successfully!", "Delete Article", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(panel, "Invalid or non-existing Article ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    logoutButton.addActionListener(e -> cardLayout.show(mainPanel, "Login"));
+
+    return panel;
+}
 
     // 2. Admin Panel for Admin Actions (Invite Users, Reset Passwords, Delete Users, List Users)
     private static JPanel createAdminPanel() {
@@ -374,28 +524,31 @@ private static JPanel createLoginPanel() {
         String username = userField.getText().trim();
         String password = new String(passField.getPassword()).trim();
         int userIndex = validateLogin(username, password);
-
+    
         if (userIndex != -1) {
             currentUserIndex = userIndex;
             User currentUser = users.get(currentUserIndex);
-
+    
             if (!currentUser.isAccountSetupComplete()) {
                 // Redirect to Finish Account Setup Panel
                 cardLayout.show(mainPanel, "FinishAccount");
             } else if (currentUser.getRoles().contains("Admin")) {
                 // If the user is an Admin, redirect to Admin Panel
                 cardLayout.show(mainPanel, "Admin");
-            } else if (currentUser.getRoles().size() > 1) {
-                // If the user has multiple roles, show role selection (not implemented in this code)
-                cardLayout.show(mainPanel, "RoleSelection");
+            } else if (currentUser.getRoles().contains("Instructor")) {
+                // If the user is an Instructor, redirect to Instructor Panel
+                cardLayout.show(mainPanel, "Instructor");
+            } else if (currentUser.getRoles().contains("Student")) {
+                // If the user is a Student, redirect to Student Panel
+                cardLayout.show(mainPanel, "Student");
             } else {
-                // User has completed setup and has only one role, show success message
-                JOptionPane.showMessageDialog(panel, "Logged in as " + currentUser.getRoles().get(0) + ".", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(panel, "No valid role assigned to this user.", "Login Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(panel, "Invalid login credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
         }
     });
+    
 
 
 
