@@ -474,7 +474,7 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
         // 5. Instructor Panel for Instructor Actions
         
         private static JPanel createInstructorPanel() {
-            JPanel panel = new JPanel(new GridLayout(8, 1)); // Updated GridLayout to add more buttons
+            JPanel panel = new JPanel(new GridLayout(5, 2)); // Updated GridLayout to add more buttons
         
             JButton searchArticlesButton = new JButton("Search Articles");
             JButton viewArticleButton = new JButton("View Article");
@@ -488,7 +488,7 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
             
             panel.add(viewFeedbackButton);
             panel.add(backupArticlesButton);
-panel.add(restoreArticlesButton);
+            panel.add(restoreArticlesButton);
 
             panel.add(searchArticlesButton);
             panel.add(viewArticleButton);
@@ -643,7 +643,7 @@ panel.add(restoreArticlesButton);
 
             // 2. Admin Panel for Admin Actions (Invite Users, Reset Passwords, Delete Users, List Users)
             private static JPanel createAdminPanel() {
-                JPanel panel = new JPanel(new GridLayout(10, 1));
+                JPanel panel = new JPanel(new GridLayout(7, 2));
 
                 JButton inviteButton = new JButton("Invite User");
                 JButton resetPasswordButton = new JButton("Reset Password");
