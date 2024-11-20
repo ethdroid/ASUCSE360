@@ -485,11 +485,14 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
             JButton restoreArticlesButton = new JButton("Restore Articles"); // New Button
             JButton logoutButton = new JButton("Logout");
             JButton viewFeedbackButton = new JButton("View Feedback");
+            JButton viewArticleGroupButton = new JButton("View Article Group");
+            JButton createArticleGroupButton = new JButton("Create Article Group");
+            JButton editArticleGroupButton = new JButton("Edit Article Group");
+            JButton deleteArticleGroupButton = new JButton("Delete Article Group");
             
             panel.add(viewFeedbackButton);
             panel.add(backupArticlesButton);
             panel.add(restoreArticlesButton);
-
             panel.add(searchArticlesButton);
             panel.add(viewArticleButton);
             panel.add(createArticleButton);
@@ -498,6 +501,10 @@ private static Map<String, Article> filterArticlesByLevel(String level) {
             panel.add(backupArticlesButton);
             panel.add(restoreArticlesButton);
             panel.add(logoutButton);
+            panel.add(viewArticleGroupButton);
+            panel.add(createArticleGroupButton);
+            panel.add(editArticleGroupButton);
+            panel.add(deleteArticleGroupButton);
         
             // Backup Articles ActionListener
             backupArticlesButton.addActionListener(e -> {
